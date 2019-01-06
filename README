@@ -1,0 +1,268 @@
+primeScaff v1.6.1
+===============
+
+Platform-independent automated primer design around gaps in genomic scaffolds
+
+CHANGES
+-------
+-> primeScaff v1.6.1 <-
+1. Made available packages specific for Linux (i686 and x86_64) ans OSX (i386 and x86_64) to extremely
+   simplify installation (Making is super easy!, just download, extract and presto!)
+3. Removed the precompiled primersearch. Too many problems trying to link the new files of the EMBOSS
+   (primersearch is linked to where one compiles it, as many of the dependencies from this) so now
+   each user has to download their own EMBOSS (Instructions below).
+2. Added option --scfEnds to report combinations of primers to bridge between scaffolds.
+3. Added license details for each 3rd party software included.
+4. Created a nice icon.
+
+-> primeScaff v1.6 <-
+1. Changed the way the options are assigned to variables to make the code shorter and more understandable
+   in both scripts.
+2. primeScaff is now distributed with binaries for Linux 32 and 64 bits and some MacOSX 32 and 64 bits
+   executables so its now way easier to get it up and running.
+3. Changed some lines of code so now it used only one folder for the binaries (the bin/ folder) and
+   added a primer3Config/ folder containing the necessary files for primer3 to load the
+   thermodynamic parameters and removed the option --thParamPath.
+4. Changed the thermodynamics parameters options so that now it is compliant with the latest version
+   of primer3 (v2.3.5), released January 3, 2013. So if you're using the most up-to-date version of primer3,
+   use this new version of the software.
+5. Changed the binaries path variables in both scripts to the new bin folder
+
+
+-> primeScaff v1.5 <-
+1. Made huge changes in the script algorithm itself (mainly passing many parts to subroutines).
+2. Made RECON search iterative to improve repetitive element detection and greatly avoid repetitive
+   primer design.
+3. Greatly improved the speed of the primer search by cutting down the query sequence to one that
+   contains the interest and useful one (gap-maxAmp to gap+maxAmp).
+4. Added a minGap option to control the minimum size of the gap (in N characters).
+5. Added some more notes to the documentation, ESPECIALLY read the note on paths.
+6. primeScaff now produces only gff files with embedded sequences.
+7. Although primeScaff still outputs a gff2 file compatible with Artemis <v14, it now makes an
+   Artemis-compatible gff3.
+
+
+INSTALL
+-------
+-> Use the precompiled binaries included in the download <-
+
+DOWNLOAD, EXTRACT (tar -zxvf primescaff-v**_**_***.tar.gz), AND USE!!!
+
+***IF YOU WANT TO USE THE PRIMERCHECK SCRIPT YOU WILL HAVE TO DOWNLOAD YOUR OWN EMBOSS COPY AND COMPILE (SEE BELOW)***
+
+Included in the download you will find a folder named bin/ in which all the precompiled binaries for
+Linux and MacOSX 32 and 64 bits are included (in subfolders). to know which type of system you have
+you can type in the terminal 'uname -a' and you will most probably see i686 (or if your computer is
+really really old you will see i386, i486 or i586) (32-bit) or x86_64 (64-bit). If you have a 
+different architecture machine (which should be rare..) you will have to compile your own binaries
+(see below).
+
+Inside the bin folder you will subfolders containing the following executable for your architecture:
+
+	-> RECON-v1.07.1
+	
+	   edgeredef
+	   eledef
+	   eleredef
+	   famdef
+	   imagespread
+	   
+	-> formatdb and megablast
+	
+	   formatdb
+	   megablast
+	
+	-> primer3
+	
+	   long_seq_tm_test
+	   ntdpal
+	   ntthal
+	   oligotm
+	   primer3_core
+	
+**** NOTE ON EMBOSS INSTALL ****
+LINUX:
+	go to the bin folder in your brand new primeScaff dir
+	$ cd pathTo/primeScaff-vX.X.X/bin;
+	
+	Download the latest emboss tools package through the terminal
+	$ wget ftp://emboss.open-bio.org/pub/EMBOSS/emboss-latest.tar.gz;
+	or in MAC that has no wget
+	Download from safari,Firefox,chrome,etc.. ftp://emboss.open-bio.org/pub/EMBOSS/emboss-latest.tar.gz and move the downloaded compressed file to
+	pathTo/primeScaff-vX.X.X/bin
+	
+	Extract the downloaded file
+	$ tar -zxvf emboss-latest.tar.gz
+	
+	Rename the folder into 'EMBOSS'
+	$ mv EMBOSS-X.X.X EMBOSS;
+	
+	Go to the EMBOSS folder and compile emboss
+	$ cd EMBOSS;
+	$./configure; make;
+	
+	This should take some minutes and give no errors.
+	
+	PRESTO! After this, you should have a working primersearch to use with primerCheck script.
+	
+MAC:
+	**** First be sure you have Xcode (and command line tools) installed, if not go to https://developer.apple.com/xcode/, donwload and install****
+	You will need to register for an Apple Developer Connection account.
+	
+		Download Xcode from the app store
+		then go to Xcode menu > Preferences > Downloads > choose "Command line tools" > Click "Install" button
+		Thats it.
+	
+	The rest of the steps would be the same as for Linux
+	
+### NOTE ON PREBUILT BINARIES ###
+
+If you want to test weather the binaries work or not you should try to execute them as './program',
+you should see some kind of message. If not that means you will have to build your own binaries
+(see the 'Compile yourself the binaries' section on this document).
+
+*********PPC COMPUTERS WILL HAVE TO BUILD THEIR OWN BINARIES************.
+
+#################################
+
+-> Compile yourself the binaries <-
+
+primeScaff and the primerCheck wrapper script are implemented in Perl, requiring the
+following core modules which should not require further installation if you already
+have Perl installed in your system.
+
+	Getopt::Long;
+	Pod::Usage;
+	File::Copy;
+	
+primeScaff depends on the program RECON v1.07.1 which you should have got in the file primeScaff-v1.6.tar.gz
+inside the dependencies folder. To be able to run RECON properly one must have both formatdb and megablast
+either locally or globally. The script primerCheck depends on primersearch from the EMBOSS package.
+Except for RECON, this programs will be usually present in most machines dedicated to bio-informatics.
+
+	Linux and MacOSX
+
+	-> RECON-v1.07.1
+	   
+	   Open a terminal and go to the RECON-1.07.1/src directory. Type make, and copy the
+	   binary files created to the RECON-1.07.1/bin directory.
+	   
+	   cd dependencies/RECON-1.07.1/src
+	   make
+	   cp edgeredef pathTo/primeScaff/bin/recon
+	   cp eledef pathTo/primeScaff/bin/recon
+	   cp eleredef pathTo/primeScaff/bin/recon
+	   cp famdef pathTo/primeScaff/bin/recon
+	   cp imagespread pathTo/primeScaff/bin/recon
+	
+	-> formatdb and megablast
+	
+	   On Ubuntu or other Linux debian systems you can install it simply using apt-get install <name_of_the_package>,
+	   on Ubuntu 12.04 and 10.04 the package is called blast2. If not, blast pre-compiled executables can be
+	   found here ftp://ftp.ncbi.nlm.nih.gov/blast/executables/release/LATEST/, simply decompress the package
+	   and the executables must be in the 'bin/' subfolder. then move the formatdb and megablast binaries to
+	   the bin/ subfolder of primeScaff.
+	   
+	   cd blast-X.X.XX/bin;
+	   cp formatdb pathTo/primeScaff/bin/blast
+	   cp megablast pathTo/primeScaff/bin/blast
+	   
+	   Alternatively download the file 'ncbi-blast-2.2.28+-src.tar.gz' and follow the compilation instructions
+	   and then copy the formatdb and megablast binaries to 'pathTo/primeScaff/bin' folder.
+	
+	-> primer3
+	
+	   On Ubuntu or other Linux debian systems you can install it simply using apt-get install <name_of_the_package>,
+	   on Ubuntu 12.04 and 10.04 the package is called primer3. If not, source code can be downloaded from
+	   here http://sourceforge.net/projects/primer3/, simply decompress the package, move to the 'src/' folder
+	   'cd src', and then type 'make all' and the executables must be in the same 'src/' folder.
+	   
+	   tar -zxvf primer3-x.x.x.tar.gz
+	   cd primer3-x.x.x/src
+	   make all
+	   cp long_seq_tm_test pathTo/primeScaff/bin/prmier3
+	   cp ntdpal pathTo/primeScaff/bin/prmier3
+	   cp ntthal pathTo/primeScaff/bin/prmier3
+	   cp oligotm pathTo/primeScaff/bin/prmier3
+	   cp primer3_core pathTo/primeScaff/bin/prmier3
+	   
+	-> primersearch
+	   
+	   On Ubuntu or other Linux debian systems you can install it simply using apt-get install <name_of_the_package>,
+	   on Ubuntu 12.04 and 10.04 the package is called emboss. If not, source code can be downloaded from
+	   here ftp://emboss.open-bio.org/pub/EMBOSS/. Download the file emboss-latest.tar.gz and then simply
+	   decompress the package and then go to the decompressed directory and type './configure' and then 'make'.
+	   This will build executables to your system in the emboss/ subdirectory.
+	   
+	   tar -zxvf emboss-latest.tar.gz
+	   mv EMBOSS-x.x.x EMBOSS
+	   cd EMBOSS
+	   make
+
+**************READ THE NOTE ON PATHS***************************s
+
+
+RUNNING primeScaff AND primerCheck
+----------------------------------
+
+Typing perl primeScaff -man or primerCheck -man will give you all the options available and the syntax to run the
+scripts. Examples of "standard" runs of primeScaff can be found below:
+
+perl primeScaff.pl -i scaffolds.fasta --ampSize '100-2000' -p outFile -d outDir --best --clean
+
+perl primerCheck.pl -i 'outDir/SCt_gapClose.primer.fasta' -s 'outDir/outFile.masked.fasta' -p outFile
+
+******NOTES********
+	1. Remember to use simple names for the fasta Headers, trying to avoid any non-alpha-numeric character like in the 
+	   example files
+	   >Rinsect_LSR1_Scaffold1
+	   Otherwise it can cause RECON to crash
+	2. Since version 14, Artemis uses GFF3 files. Other older versions should work with GFF2 files. GFF2 files of
+	   primeScaff were tested with v13.xx. For older versions of Artemis (meaning <14, GFF2 files are still
+	   generated)
+****	3. VERY IMPORTANT: REMEMBER TO KEEP PATHS SIMPLE AND FREE OF THINGS LIKE WHITE-SPACES OR TO WRITE THEM
+	   WITH THE PROBLEMATIC CHARACTERS PROPERLY ESCAPED. TRY TO AVOID RELATIVE PATHS. ALWAYS TRY TO USE
+	   ABSOLUTE PATHS
+	   
+
+TIPS
+----
+
+	1. To find out where the binary files are located if they were added to the PATH environment variable simply
+	   type 'which program'  
+
+	2. For changing headers of FASTA files downloaded from the NCBIs genome database you can use:
+	   
+	   sed 's/^>\S\+ Strain Name/>Short_version_strain_name/' inFile.fasta | sed 's/ genomic scaffold//' | sed 's/\, .\+$//' | sed 's/ /_/g'  > temp; mv temp inFile.fasta
+
+
+CITING
+------
+
+A primeScaff publication is intended and hopefully we manage to publish it soon. In the meanwhile, refer to
+the sourceforge web page of primeScaff
+
+
+BUG REPORTS
+-----------
+
+If you find a bug please email me at << <alejandro_dot_manzano_at_uv_dot_es> >> so that I can keep making
+primeScaff better.
+
+
+COPYRIGHT AND LICENSE
+---------------------
+
+Copyright (C) 2012-2013  Alejandro Manzano Marin (https://www.researchgate.net/profile/Alejandro_Manzano-Marin/).
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program.  If not, see <http://www.gnu.org/licenses/>.
